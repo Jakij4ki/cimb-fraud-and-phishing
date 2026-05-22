@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">SafeCheck Favicon</title>
+  <path d="M 32 4 L 56 14 L 56 34 C 56 49 46 58 32 62 C 18 58 8 49 8 34 L 8 14 L 32 4 Z" fill="#0A2540"/>
+  <path d="M 32 10 L 50 18 L 50 34 C 50 45 42 52 32 56 C 22 52 14 45 14 34 L 14 18 L 32 10 Z" fill="#0D2845" opacity="0.72"/>
+  <path d="M 17 20 C 26 14 38 14 47 20" fill="none" stroke="#1B6EF3" stroke-opacity="0.6" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M 19 34 L 29 44 L 46 24" fill="none" stroke="#10B981" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

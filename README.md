@@ -21,6 +21,7 @@
 - [API Documentation](#api-documentation)
 - [Security Checklist](#security-checklist)
 - [Tim Pengembang](#tim-pengembang)
+
 ---
  
 ## Tentang Proyek
@@ -36,6 +37,7 @@ SafeCheck adalah sistem anti-phishing berbasis web yang membantu nasabah perbank
 - **Sistem Pelaporan** — Laporan dengan nomor tiket yang bisa dilacak statusnya
 - **Pusat Edukasi** — Materi literasi keamanan digital dengan quiz dan badge gamifikasi
 - **Admin Dashboard** — Panel triage, analytics, dan manajemen whitelist
+
 ### Algoritma Scoring
  
 | Kondisi | Poin |
@@ -96,6 +98,7 @@ Input Pesan
 - **IndoBERT** (`indolem/indobert-base-uncased`) — NLP classifier
 - **RandomForest + XGBoost** — URL phishing classifier
 - **Alembic** — Database migrations
+
 ### Frontend
 - **React 18** + **Vite** — UI framework
 - **Tailwind CSS 3** — Styling
@@ -104,9 +107,11 @@ Input Pesan
 - **Recharts** — Charts & analytics
 - **Framer Motion** — Animasi
 - **Lucide React** — Icon library
+
 ### Infrastructure
 - **Docker Compose** — Container orchestration
 - **Nginx** — Reverse proxy + static file serving
+
 ---
  
 ## Cara Kerja
@@ -118,6 +123,7 @@ Input Pesan
 3. Pilih jenis pesan dan klik **Analisis Sekarang**
 4. Lihat hasil: Risk Score, penjelasan, dan komponen yang terdeteksi
 5. Jika mencurigakan, klik **Laporkan Pesan Ini** untuk mendapat nomor tiket
+
 ### Untuk Admin
  
 1. Login ke `/admin/login`
@@ -125,6 +131,7 @@ Input Pesan
 3. Triage laporan masuk: konfirmasi, tolak, atau eskalasi
 4. Kelola whitelist domain dan nomor telepon resmi
 5. Pantau tren modus penipuan di halaman Analytics
+
 ---
  
 ## Struktur Folder
@@ -185,6 +192,7 @@ phishing-guard/
 - Node.js 20+
 - Docker Desktop (sudah running)
 - Git
+
 ### Langkah-langkah
  
 **1. Clone repository**
@@ -322,6 +330,7 @@ Semua file dataset ditempatkan di `backend/data/` (tidak di-commit ke Git).
 - **ealvaradob/phishing-dataset** — 800K+ URL phishing (`huggingface.co/datasets/ealvaradob/phishing-dataset`)
 - **PhiUSIIL Kaggle** — 235K URL dengan 54 fitur teknis (`kaggle.com/datasets/ndarvind/phiusiil-phishing-url-dataset`)
 - **Dataset buatan sendiri** — 54 baris SMS + WA + Email konteks CIMB Niaga
+
 ---
  
 ## API Documentation
@@ -393,6 +402,7 @@ Sebelum deploy ke production, pastikan semua item berikut sudah dilakukan:
 - [ ] Tidak ada credentials yang ter-hardcode di source code
 - [ ] Review log untuk memastikan isi pesan user tidak ter-log
 - [ ] Rotasi `SECRET_KEY` secara berkala
+
 ---
  
 ## Tim Pengembang
@@ -423,4 +433,3 @@ Dataset yang digunakan bersifat sintetis dan tidak mengandung data nasabah riil.
 <div align="center">
   <sub>Dibuat dengan ❤️ oleh Tim Capstone B.3 — FILKOM UB 2026</sub>
 </div>
- 

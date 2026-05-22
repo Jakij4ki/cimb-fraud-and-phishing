@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 340" role="img" aria-labelledby="title">
+  <title id="title">SafeCheck Hero Illustration</title>
+  <ellipse cx="274" cy="148" rx="208" ry="132" fill="#EFF6FF" opacity="0.7"/>
+  <ellipse cx="262" cy="136" rx="150" ry="92" fill="#DBEAFE" opacity="0.5"/>
+
+  <path d="M 150 144 C 188 128 210 126 230 136" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="5 4" stroke-linecap="round"/>
+  <path d="M 370 144 C 332 128 310 126 290 136" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="5 4" stroke-linecap="round"/>
+  <path d="M 172 250 C 205 221 224 194 237 169" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="5 4" stroke-linecap="round"/>
+  <path d="M 384 256 C 345 226 319 196 294 166" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="5 4" stroke-linecap="round"/>
+
+  <rect x="38" y="114" width="124" height="66" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <circle cx="56" cy="140" r="5" fill="#EF4444"/>
+  <rect x="68" y="130" width="54" height="6" rx="3" fill="#CBD5E1"/>
+  <rect x="68" y="144" width="70" height="6" rx="3" fill="#E2E8F0"/>
+  <rect x="68" y="158" width="45" height="6" rx="3" fill="#FCA5A5"/>
+  <rect x="104" y="122" width="48" height="18" rx="9" fill="#EF4444"/>
+  <text x="128" y="134" text-anchor="middle" font-family="'DM Sans', 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#FFFFFF">BAHAYA</text>
+
+  <rect x="358" y="114" width="124" height="66" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <circle cx="376" cy="140" r="6" fill="#10B981"/>
+  <path d="M 373 140 L 376 143 L 381 137" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="390" y="130" width="54" height="6" rx="3" fill="#CBD5E1"/>
+  <rect x="390" y="144" width="66" height="6" rx="3" fill="#E2E8F0"/>
+  <rect x="390" y="158" width="48" height="6" rx="3" fill="#A7F3D0"/>
+  <rect x="430" y="122" width="42" height="18" rx="9" fill="#10B981"/>
+  <text x="451" y="134" text-anchor="middle" font-family="'DM Sans', 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#FFFFFF">AMAN</text>
+
+  <rect x="64" y="232" width="108" height="52" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="78" y="244" width="28" height="14" rx="7" fill="#EFF6FF"/>
+  <text x="92" y="254" text-anchor="middle" font-family="'DM Sans', 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#1B6EF3">SMS</text>
+  <rect x="78" y="265" width="70" height="5" rx="2.5" fill="#CBD5E1"/>
+  <rect x="78" y="275" width="52" height="5" rx="2.5" fill="#E2E8F0"/>
+
+  <rect x="348" y="232" width="108" height="66" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="402" y="250" text-anchor="middle" font-family="'DM Sans', 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7.5" font-weight="800" letter-spacing="0.9" fill="#64748B">RISK SCORE</text>
+  <text x="402" y="278" text-anchor="middle" font-family="'DM Sans', 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="30" font-weight="800" fill="#EF4444">85</text>
+  <rect x="370" y="286" width="64" height="6" rx="3" fill="#FEE2E2"/>
+  <rect x="370" y="286" width="54" height="6" rx="3" fill="#EF4444"/>
+
+  <path d="M 260 48 L 322 70 L 322 146 C 322 190 297 222 260 239 C 223 222 198 190 198 146 L 198 70 L 260 48 Z" fill="#0A2540"/>
+  <path d="M 260 62 L 306 78 L 306 146 C 306 180 286 204 260 217 C 234 204 214 180 214 146 L 214 78 L 260 62 Z" fill="#0D2845" opacity="0.72"/>
+  <path d="M 222 84 C 245 70 275 70 298 84" fill="none" stroke="#1B6EF3" stroke-opacity="0.5" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 225 146 L 252 172 L 298 115" fill="none" stroke="#10B981" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="72" cy="68" r="5" fill="#BFDBFE"/>
+  <circle cx="446" cy="74" r="4" fill="#A7F3D0"/>
+  <circle cx="488" cy="208" r="5" fill="#FCA5A5"/>
+  <circle cx="42" cy="258" r="4" fill="#FDE68A"/>
+  <circle cx="252" cy="300" r="3.5" fill="#BFDBFE"/>
+  <circle cx="316" cy="36" r="3.5" fill="#A7F3D0"/>
+
+  <path d="M 120 58 L 120 70 M 114 64 L 126 64" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 474 274 L 474 286 M 468 280 L 480 280" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 338 312 L 338 322 M 333 317 L 343 317" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
