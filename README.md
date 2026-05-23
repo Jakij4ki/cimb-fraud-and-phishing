@@ -270,11 +270,27 @@ Frontend berjalan di: `http://localhost:3000`
 ---
  
 ## Setup Production
- 
+
+Sistem mendukung arsitektur **Dual-Mode** untuk backend NLP.
+
+### Opsi A: Mode Demo Default (SANGAT DISARANKAN)
+Mode ini sangat ringan dan cepat karena tidak mengunduh dependensi Deep Learning. Sistem akan menggunakan *rule-based fallback* untuk deteksi teks.
+
 ```bash
-# Build dan jalankan semua service
+# Build dan jalankan mode default
 docker compose up -d --build
- 
+```
+
+### Opsi B: Mode ML Full (IndoBERT)
+Mode ini membutuhkan folder model ML (`app/ml/model/indobert-phishing`) dan menginstall dependensi besar seperti `torch` dan `transformers`. 
+
+```bash
+# Build dan jalankan mode ML Full
+docker compose -f docker-compose.yml -f docker-compose.ml.yml up -d --build
+```
+
+### Manajemen Container
+```bash
 # Cek semua service berjalan
 docker compose ps
  

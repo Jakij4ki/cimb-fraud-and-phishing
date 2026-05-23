@@ -8,6 +8,7 @@ import ReportForm from '../components/report/ReportForm';
 import Button from '../components/ui/Button';
 import { useAnalyze } from '../hooks/useAnalyze';
 import { useToastStore } from '../components/ui/Toast';
+import { useAnalysisStore } from '../store/analysisStore';
 
 const Analyze = () => {
   const { status, result, error, analyze, reset } = useAnalyze();
@@ -32,6 +33,15 @@ const Analyze = () => {
       message: `Laporan berhasil dikirim. ID Tiket: ${ticketId}`
     });
     // In a real app, we might redirect to the tracker page or show a link
+  };
+
+  const handleRetry = () => {
+    const { inputText, messageType } = useAnalysisStore.getState();
+    if (!inputText || inputText.trim() === '') {
+      reset();
+      return;
+    }
+    analyze(inputText, messageType);
   };
 
   return (
@@ -86,7 +96,7 @@ const Analyze = () => {
             </p>
             <div className="flex gap-4 justify-center">
               <Button variant="secondary" onClick={reset}>Kembali</Button>
-              <Button onClick={() => handleAnalyze(useAnalysisStore.getState().inputText, useAnalysisStore.getState().messageType)}>
+              <Button onClick={handleRetry}>
                 Coba Lagi
               </Button>
             </div>

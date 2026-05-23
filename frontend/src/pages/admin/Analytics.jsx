@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, BarChart2, TrendingUp } from 'lucide-react';
+import { adminService } from '../../services/adminService';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   LineChart, Line, Legend
@@ -9,36 +10,24 @@ import ThreatMap from '../../components/admin/ThreatMap';
 const Analytics = () => {
   const [period, setPeriod] = useState('30days');
 
-  // Mock data
-  const topModusData = [
-    { name: 'Impersonasi CS', count: 450 },
-    { name: 'Undian Palsu', count: 320 },
-    { name: 'APK Resi/Undangan', count: 280 },
-    { name: 'Blokir Rekening', count: 190 },
-    { name: 'Link Promo', count: 120 },
-  ];
+  const [statsData, setStatsData] = useState(null);
 
-  const topChannelData = [
-    { name: 'WhatsApp', count: 850 },
-    { name: 'SMS', count: 420 },
-    { name: 'Email', count: 110 },
-    { name: 'Lainnya', count: 40 },
-  ];
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const stats = await adminService.getDashboardStats();
+        setStatsData(stats);
+      } catch (err) {
+        console.error("Fetch analytics error:", err);
+      }
+    };
+    fetchAnalytics();
+  }, [period]);
 
-  const trendsData = [
-    { name: 'Minggu 1', phishing: 120, malware: 30, spam: 80 },
-    { name: 'Minggu 2', phishing: 150, malware: 45, spam: 90 },
-    { name: 'Minggu 3', phishing: 180, malware: 60, spam: 85 },
-    { name: 'Minggu 4', phishing: 140, malware: 80, spam: 110 },
-  ];
-
-  const topKeywords = [
-    { word: 'diblokir', count: 342, category: 'ANCAMAN' },
-    { word: 'pin anda', count: 289, category: 'DATA_SENSITIF' },
-    { word: 'menang', count: 256, category: 'IMING_IMING' },
-    { word: 'segera', count: 210, category: 'URGENSI' },
-    { word: 'download aplikasi', count: 195, category: 'TINDAKAN_PAKSA' },
-  ];
+  const topModusData = statsData?.top_modus || [];
+  const topChannelData = statsData?.top_channel || [];
+  const trendsData = statsData?.trend_weekly || [];
+  const topKeywords = statsData?.top_keywords || [];
 
   return (
     <div className="space-y-6">

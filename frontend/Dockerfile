@@ -1,9 +1,8 @@
 # Stage 1: Builder
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package.json ./
-# Provide a fallback if package-lock is missing
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
 RUN npm run build
 

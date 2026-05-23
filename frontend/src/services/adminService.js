@@ -28,8 +28,8 @@ export const adminService = {
     const response = await api.post('/admin/whitelist', data);
     return response.data;
   },
-  deleteWhitelist: async (id) => {
-    const response = await api.delete(`/admin/whitelist/${id}`);
+  deleteWhitelist: async (id, type) => {
+    const response = await api.delete(`/admin/whitelist/${id}`, { params: { type } });
     return response.data;
   },
   getDashboardStats: async () => {

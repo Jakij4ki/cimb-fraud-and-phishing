@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from uuid import UUID
@@ -12,6 +12,7 @@ class TokenResponse(BaseModel):
     token_type: str
 
 class ReportListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     ticket_id: str
     status: str
@@ -26,6 +27,7 @@ class ReportListResponse(BaseModel):
     data: List[ReportListItem]
 
 class ReportDetailResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     ticket_id: str
     message_text: str
@@ -64,3 +66,5 @@ class DashboardStats(BaseModel):
     top_modus: List[Dict[str, Any]]
     top_channel: List[Dict[str, Any]]
     today_danger_count: int
+    pending_triage: int = 0
+    resolved_this_week: int = 0

@@ -9,6 +9,7 @@ const QuizWidget = ({ questions, onComplete }) => {
   const [showResult, setShowResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
+  const [userAnswers, setUserAnswers] = useState({});
 
   if (!questions || questions.length === 0) return null;
 
@@ -18,6 +19,9 @@ const QuizWidget = ({ questions, onComplete }) => {
     setSelectedAnswer(index);
     const correct = index === questions[currentIdx].correctIndex;
     setIsCorrect(correct);
+    
+    const newAnswers = { ...userAnswers, [questions[currentIdx].id || currentIdx]: index };
+    setUserAnswers(newAnswers);
     
     if (correct) {
       setScore(prev => prev + 1);
@@ -30,7 +34,11 @@ const QuizWidget = ({ questions, onComplete }) => {
         setIsCorrect(null);
       } else {
         setShowResult(true);
-        if (onComplete) onComplete({ score: score + (correct ? 1 : 0), total: questions.length });
+        if (onComplete) onComplete({ 
+            score: score + (correct ? 1 : 0), 
+            total: questions.length,
+            answers: newAnswers
+        });
       }
     }, 1500);
   };
@@ -112,6 +120,7 @@ const QuizWidget = ({ questions, onComplete }) => {
               setScore(0);
               setShowResult(false);
               setSelectedAnswer(null);
+              setUserAnswers({});
             }}>
               Coba Lagi
             </Button>

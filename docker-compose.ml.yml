@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.ml
+    environment:
+      - ENABLE_ML_MODEL=true
+      - ML_MODEL_PATH=/app/app/ml/model/indobert-phishing
+    volumes:
+      - ./backend/app/ml/model:/app/app/ml/model:ro

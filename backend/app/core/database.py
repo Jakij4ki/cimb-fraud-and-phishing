@@ -19,6 +19,8 @@ async def get_db() -> AsyncSession:
 
 async def init_db():
     async with engine.begin() as conn:
-        # Tables can be created via alembic migrations, 
-        # or optionally initialized here if needed.
-        pass
+        from app.models.admin import AdminUser
+        from app.models.report import Report
+        from app.models.whitelist import WhitelistURL, WhitelistPhone, RiskKeyword
+        from app.models.education import EducationContent, QuizResult, UserBadge
+        await conn.run_sync(Base.metadata.create_all)

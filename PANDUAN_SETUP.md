@@ -1,79 +1,54 @@
 # Panduan Setup dan Eksekusi Sistem
 
-Dokumen ini memuat langkah-langkah teknis untuk menjalankan sistem deteksi phishing secara lokal.
+Dokumen ini memuat langkah-langkah teknis untuk menjalankan sistem deteksi phishing secara lokal. Aplikasi ini mendukung arsitektur **Dua Mode (Dual-Mode)** untuk model pendeteksi teks (NLP).
 
 ## Persyaratan Sistem
 Pastikan perangkat lunak berikut telah terinstal:
-- Python 3.11 atau versi lebih baru
-- Node.js (versi 16 atau lebih baru) dan npm
-- Docker dan Docker Compose
+- Docker dan Docker Desktop (harus dalam kondisi **Running**)
 
 ## 1. Konfigurasi Environment Variable
-1. Salin file `.env.example` di direktori utama proyek menjadi `.env`.
-2. Sesuaikan nilai variabel pada file `.env` dengan konfigurasi lokal keras (misalnya kredensial database).
-
-## 2. Menjalankan Database dan Redis
-Sistem membutuhkan PostgreSQL dan Redis yang dijalankan melalui Docker. Jalankan perintah berikut pada root direktori proyek:
-```bash
-docker-compose up -d db redis
-```
-Pastikan kontainer beroperasi normal.
-
-## 3. Setup Backend
-1. Masuk ke direktori backend:
-   ```bash
-   cd backend
-   ```
-2. (Opsional) Buat dan aktifkan Virtual Environment:
-   - Windows: `python -m venv venv` dan `.\venv\Scripts\activate`
-   - Linux/macOS: `python3 -m venv venv` dan `source venv/bin/activate`
-3. Instal dependensi:
-   ```bash
-   pip install -r requirements.txt
+1. Salin file `.env.example` di direktori utama proyek menjadi `.env` (jika belum ada).
+2. Pastikan `DATABASE_URL` di dalam file `.env` menunjuk ke `db` (bukan localhost) jika menjalankan via Docker:
+   ```env
+   DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/cimb_phishing_db
    ```
 
-## 4. Inisialisasi Data (Seeding)
-Untuk mengisi struktur dan data awal ke dalam database, jalankan skrip berikut dari direktori root proyek:
+---
+
+## 2. Menjalankan Sistem Penuh (Docker Compose)
+
+Sistem memiliki dua mode untuk backend. Silakan pilih salah satu sesuai kebutuhan.
+
+### Opsi A: Mode Demo Default (SANGAT DISARANKAN UNTUK PRESENTASI)
+Mode ini menggunakan image ringan tanpa mengunduh framework Deep Learning (`torch`, `transformers`) atau *artifact* model berukuran besar. Mode ini mengaktifkan algoritma deteksi **rule-based fallback** yang sangat stabil, meminimalisir waktu build, dan mengurangi penggunaan RAM & CPU.
+
+Jalankan perintah berikut di root direktori proyek:
 ```bash
-python database/seed.py
-python database/seed_riskwords_js.py
+docker compose up --build -d
 ```
 
-## 5. Pelatihan Model Machine Learning
-Jika model (NLP, Random Forest, XGBoost) belum tersedia di dalam direktori `backend/app/ml/model/`, jalankan proses pelatihan model. Pastikan dataset berada di folder `backend/data/` terlebih dahulu.
+### Opsi B: Mode ML Full (IndoBERT)
+Mode ini mengaktifkan model Deep Learning secara penuh. Karena membutuhkan instalasi `torch` dan `transformers`, waktu build akan lebih lama dan ukuran container akan lebih besar. Pastikan juga Anda sudah memiliki folder model di `backend/app/ml/model/indobert-phishing` karena model besar *tidak* disimpan di Git Repository!
+
+Jalankan perintah berikut:
 ```bash
-cd backend
-python app/ml/train_nlp.py
-python app/ml/train_url_raw.py
-python app/ml/train_url_features.py
+docker compose -f docker-compose.yml -f docker-compose.ml.yml up --build -d
 ```
 
-## 6. Menjalankan Backend Server
-Setelah inisialisasi selesai, jalankan server FastAPI:
-```bash
-cd backend
-uvicorn app.main:app --reload
-```
-API dapat diakses melalui `http://localhost:8000`. Dokumentasi interaktif (Swagger UI) tersedia pada `http://localhost:8000/docs`.
+**Verifikasi Mode yang Berjalan**
+Lakukan pengujian pada endpoint analisis (`POST /api/v1/analyze`). Perhatikan bagian balasan JSON pada kunci `nlp_method`.
+- Jika `nlp_method` bernilai `"rule_based_fallback"`, berarti Mode Demo aktif.
+- Jika `nlp_method` bernilai `"indobert"`, berarti Mode ML Full berhasil diload.
 
-## 7. Setup Frontend
-1. Buka terminal baru dan masuk ke direktori frontend:
-   ```bash
-   cd frontend
-   ```
-2. Instal dependensi Node.js:
-   ```bash
-   npm install
-   ```
-3. Jalankan development server:
-   ```bash
-   npm run dev
-   ```
-Frontend akan berjalan dan dapat diakses pada alamat yang diberikan oleh Vite (umumnya `http://localhost:5173`).
+---
 
-## Alternatif: Eksekusi Penuh via Docker
-Untuk menjalankan seluruh layanan (Backend, Frontend, Database, Redis, dan Nginx) secara terintegrasi menggunakan Docker Compose:
-```bash
-docker-compose up -d --build
-```
-Aplikasi frontend akan terekspos pada port 80 (`http://localhost`), sedangkan rute API akan diteruskan oleh Nginx ke `http://localhost/api`.
+### Kredensial Admin Default
+Jika database dalam kondisi kosong saat pertama kali dijalankan, proses *seeding* otomatis akan membuatkan akun admin bawaan berikut:
+- **Username**: `admin`
+- **Password**: `changeme123` (harap ganti di *production*)
+
+### Akses Aplikasi
+- **Frontend / Aplikasi Utama**: `http://localhost`
+- **Backend API Docs (Swagger UI)**: `http://localhost/api/docs`
+
+---

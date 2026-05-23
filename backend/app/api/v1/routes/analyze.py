@@ -68,5 +68,7 @@ async def analyze_message(
         breakdown=score_res.breakdown,
         typosquatting_alerts=[a.dict() for a in typos_alerts],
         components=components_dict,
+        nlp_method=nlp_res.get("method"),
+        nlp_confidence=nlp_res.get("confidence"),
         processing_time_ms=score_res.processing_time_ms
     )

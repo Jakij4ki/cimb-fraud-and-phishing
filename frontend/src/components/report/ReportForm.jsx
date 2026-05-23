@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../ui/Button';
 import { truncateText } from '../../utils/sanitize';
+import { reportService } from '../../services/reportService';
 
 const ReportForm = ({ analysisResult, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const ReportForm = ({ analysisResult, onSuccess, onCancel }) => {
     notes: ''
   });
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,15 +19,37 @@ const ReportForm = ({ analysisResult, onSuccess, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
+    setErrorMsg('');
     try {
-      // simulate API call delay
-      await new Promise(res => setTimeout(res, 1500));
-      // In real implementation, you would call reportService.submitReport
-      const mockTicketId = `PG-2026-${Math.floor(10000 + Math.random() * 90000)}`;
-      onSuccess(mockTicketId);
+      const payload = {
+        message_text: analysisResult?.original_text || analysisResult?.message_text || analysisResult?.input_text || '',
+        message_type: analysisResult?.message_type || 'SMS',
+        risk_score: analysisResult?.risk_score || analysisResult?.score || 0,
+        risk_level: analysisResult?.risk_level || 'warning',
+        explanation_text: analysisResult?.explanation || analysisResult?.explanation_text || '',
+        extracted_urls: analysisResult?.extracted_urls || analysisResult?.components?.urls || [],
+        extracted_phones: analysisResult?.extracted_phones || analysisResult?.components?.phones || [],
+        extracted_emails: analysisResult?.extracted_emails || analysisResult?.components?.emails || [],
+        breakdown: analysisResult?.breakdown || [],
+        typosquatting_alerts: analysisResult?.typosquatting_alerts || [],
+        reporter_name: formData.reporter_name || null,
+        reporter_email: formData.reporter_contact || null,
+        admin_notes: formData.notes || null
+      };
+
+      const response = await reportService.submitReport(payload);
+      const ticketId = response.ticket_id || response.data?.ticket_id;
+      
+      if (ticketId) {
+        onSuccess(ticketId);
+      } else {
+        throw new Error("Invalid ticket ID received");
+      }
     } catch (err) {
       console.error(err);
+      setErrorMsg('Laporan gagal dikirim. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -35,6 +59,12 @@ const ReportForm = ({ analysisResult, onSuccess, onCancel }) => {
     <div className="bg-white rounded-xl shadow p-6 max-w-lg mx-auto">
       <h3 className="text-xl font-bold text-primary mb-4">Laporkan Pesan Mencurigakan</h3>
       
+      {errorMsg && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+          {errorMsg}
+        </div>
+      )}
+
       <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-6">
         <p className="text-sm font-medium text-slate-500 mb-1">Pesan yang dilaporkan:</p>
         <p className="text-sm text-slate-800 break-words italic">

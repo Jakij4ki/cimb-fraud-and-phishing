@@ -3,6 +3,7 @@ import { Search, Plus, AlertTriangle, Link as LinkIcon, Phone, Check, X, Trash2 
 import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import { useToastStore } from '../../components/ui/Toast';
+import { adminService } from '../../services/adminService';
 
 const Whitelist = () => {
   const [activeTab, setActiveTab] = useState('URL');
@@ -26,17 +27,43 @@ const Whitelist = () => {
 
   const addToast = useToastStore(state => state.addToast);
 
-  useEffect(() => {
-    // Mock fetch
-    setTimeout(() => {
+  const fetchWhitelist = async () => {
+    setLoading(true);
+    try {
+      const res = await adminService.getWhitelist();
+      
+      const formattedUrls = (res.urls || []).map(u => ({
+        id: u.id,
+        value: u.domain,
+        type: 'URL',
+        label: u.label,
+        category: u.category || u.institution || 'Bank',
+        is_active: u.is_active
+      }));
+      
+      const formattedPhones = (res.phones || []).map(p => ({
+        id: p.id,
+        value: p.phone_number,
+        type: 'PHONE',
+        label: p.label,
+        category: p.institution || p.category || 'Bank',
+        is_active: p.is_active
+      }));
+      
+      setData([...formattedUrls, ...formattedPhones]);
+    } catch (err) {
+      console.error("Fetch whitelist error:", err);
+      // Fallback
       setData([
-        { id: 1, value: 'cimbniaga.co.id', type: 'URL', label: 'CIMB Niaga Corporate', category: 'Bank', is_active: true },
-        { id: 2, value: 'octoclicks.co.id', type: 'URL', label: 'OCTO Clicks', category: 'Bank', is_active: true },
-        { id: 3, value: '14041', type: 'PHONE', label: 'Call Center CIMB', category: 'Bank', is_active: true },
-        { id: 4, value: '02129978888', type: 'PHONE', label: 'CIMB Head Office', category: 'Bank', is_active: false },
+        { id: 1, value: '(Fallback) cimbniaga.co.id', type: 'URL', label: 'CIMB Niaga Corporate', category: 'Bank', is_active: true }
       ]);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
+  };
+
+  useEffect(() => {
+    fetchWhitelist();
   }, []);
 
   const filteredData = data.filter(item => {
@@ -52,23 +79,37 @@ const Whitelist = () => {
     addToast({ type: 'success', message: 'Status berhasil diperbarui' });
   };
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
-    const newItem = {
-      id: Date.now(),
-      ...formData
-    };
-    setData([...data, newItem]);
-    setIsAddModalOpen(false);
-    addToast({ type: 'success', message: 'Entri berhasil ditambahkan' });
-    setFormData({ value: '', type: activeTab, label: '', category: 'Bank', is_active: true });
+    try {
+      await adminService.addWhitelist({
+        type: formData.type.toLowerCase(),
+        value: formData.value,
+        label: formData.label,
+        category: formData.category,
+        is_active: formData.is_active
+      });
+      setIsAddModalOpen(false);
+      addToast({ type: 'success', message: 'Entri berhasil ditambahkan' });
+      setFormData({ value: '', type: activeTab, label: '', category: 'Bank', is_active: true });
+      fetchWhitelist();
+    } catch (err) {
+      console.error(err);
+      addToast({ type: 'error', message: 'Gagal menambahkan entri' });
+    }
   };
 
-  const handleDelete = () => {
-    setData(prev => prev.filter(item => item.id !== selectedItem.id));
-    setIsDeleteModalOpen(false);
-    setSelectedItem(null);
-    addToast({ type: 'success', message: 'Entri berhasil dihapus' });
+  const handleDelete = async () => {
+    try {
+      await adminService.deleteWhitelist(selectedItem.id, selectedItem.type.toLowerCase());
+      setIsDeleteModalOpen(false);
+      setSelectedItem(null);
+      addToast({ type: 'success', message: 'Entri berhasil dihapus' });
+      fetchWhitelist();
+    } catch (err) {
+      console.error(err);
+      addToast({ type: 'error', message: 'Gagal menghapus entri' });
+    }
   };
 
   return (

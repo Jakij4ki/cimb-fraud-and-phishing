@@ -29,4 +29,6 @@ class AnalyzeResponse(BaseModel):
     breakdown: List[BreakdownItem]
     typosquatting_alerts: List[TyposquattingAlertSchema]
     components: Dict[str, List[ComponentResult]]
+    nlp_method: Optional[str] = None
+    nlp_confidence: Optional[float] = None
     processing_time_ms: float

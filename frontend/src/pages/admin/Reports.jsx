@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button';
 import AuditLog from '../../components/admin/AuditLog';
 import Badge from '../../components/ui/Badge';
 import { useToastStore } from '../../components/ui/Toast';
+import { adminService } from '../../services/adminService';
 
 const Reports = () => {
   const location = useLocation();
@@ -38,33 +39,50 @@ const Reports = () => {
   }, [filter]);
 
   useEffect(() => {
-    if (detailId && reports.length > 0) {
-      const rep = reports.find(r => r.id === detailId);
-      if (rep) {
-        openDetailModal(rep);
-      }
+    if (detailId) {
+      openDetailModal(detailId);
     }
-  }, [detailId, reports]);
+  }, [detailId]);
 
   const fetchReports = async () => {
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      // Mock data
-      setReports([
-        { id: 'PG-2026-01234', message_text: 'Yth Nasabah, rek anda diblokir. Klik s.id/cimb-update', risk_score: 95, risk_level: 'danger', status: 'submitted', created_at: new Date().toISOString(), reporter_name: 'Budi', reporter_contact: '08123456789' },
-        { id: 'PG-2026-01233', message_text: 'Selamat! Nomor Anda terpilih memenangkan undian 100jt', risk_score: 85, risk_level: 'danger', status: 'in_review', created_at: new Date(Date.now() - 3600000).toISOString() },
-        { id: 'PG-2026-01232', message_text: 'Mohon info alamat pengiriman paket J&T yg tertunda', risk_score: 65, risk_level: 'warning', status: 'confirmed', created_at: new Date(Date.now() - 7200000).toISOString() },
-      ]);
+      const params = {
+        page: 1,
+        limit: 50,
+        sort_by: 'created_at',
+        order: 'desc'
+      };
+      if (filter.status) params.status = filter.status;
+      if (filter.risk_level) params.risk_level = filter.risk_level;
+      if (filter.dateFrom) params.dateFrom = filter.dateFrom;
+      if (filter.dateTo) params.dateTo = filter.dateTo;
+
+      const res = await adminService.getReports(params);
+      if (res && res.data) {
+        setReports(res.data);
+      } else {
+        setReports([]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch reports:", err);
+      setReports([]);
+      addToast({ type: 'error', message: 'Gagal memuat daftar laporan' });
     } finally {
       setLoading(false);
     }
   };
 
-  const openDetailModal = (report) => {
-    setSelectedReport(report);
-    setUpdateForm({ status: report.status, notes: '' });
-    setIsDetailModalOpen(true);
+  const openDetailModal = async (reportId) => {
+    try {
+      const detail = await adminService.getReportDetail(reportId);
+      setSelectedReport(detail);
+      setUpdateForm({ status: detail.status, notes: detail.admin_notes || '' });
+      setIsDetailModalOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch detail:", error);
+      addToast({ type: 'error', message: 'Gagal memuat detail laporan' });
+    }
   };
 
   const closeDetailModal = () => {
@@ -85,13 +103,15 @@ const Reports = () => {
   const submitUpdate = async () => {
     try {
       setIsConfirmModalOpen(false);
-      // await adminService.updateReport(selectedReport.id, updateForm);
-      await new Promise(res => setTimeout(res, 500));
-      
+      await adminService.updateReport(selectedReport.id, {
+        status: updateForm.status,
+        admin_notes: updateForm.notes
+      });
       addToast({ type: 'success', message: 'Status laporan berhasil diperbarui' });
       fetchReports();
       closeDetailModal();
     } catch (err) {
+      console.error("Update report error:", err);
       addToast({ type: 'error', message: 'Gagal memperbarui status laporan' });
     }
   };

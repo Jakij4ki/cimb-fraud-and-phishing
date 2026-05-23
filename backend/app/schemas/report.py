@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
@@ -14,11 +14,13 @@ class ReportCreate(BaseModel):
     additional_notes: Optional[str] = None
 
 class ReportResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     ticket_id: str
     status: str
     created_at: datetime
 
 class TicketStatusResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     ticket_id: str
     status: str
     risk_level: str

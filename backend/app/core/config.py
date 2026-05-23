@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
     ML_MODEL_PATH: str = "./ml/model"
+    ENABLE_ML_MODEL: bool = False
+    NLP_FALLBACK_ENABLED: bool = True
     ENVIRONMENT: str = "development"
     ADMIN_DEFAULT_PASSWORD: str = "changeme123"
     MAX_REQUEST_SIZE_MB: int = 1

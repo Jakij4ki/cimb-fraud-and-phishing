@@ -8,6 +8,7 @@ import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import EmptyState from '../components/ui/EmptyState';
 import { educationContent as fallbackEdu } from '../data/educationContent';
 import { quizQuestions as fallbackQuiz } from '../data/quizQuestions';
+import { adminService } from '../services/adminService';
 
 const Education = () => {
   const [filter, setFilter] = useState('Semua');
@@ -79,10 +80,27 @@ const Education = () => {
     ? eduContent 
     : eduContent.filter(c => c.difficulty === filter);
 
-  const handleQuizComplete = (result) => {
-    if (result.score === result.total) {
-      if (!earnedBadges.includes('expert')) {
-        setEarnedBadges([...earnedBadges, 'expert']);
+  const handleQuizComplete = async (result) => {
+    try {
+      const response = await adminService.submitQuiz({
+        content_id: '00000000-0000-0000-0000-000000000000',
+        answers: result.answers || {},
+        user_session: localStorage.getItem('safecheck_session') || 'anonymous'
+      });
+      
+      if (response.earned_badges && response.earned_badges.length > 0) {
+        const newBadges = response.earned_badges.filter(b => !earnedBadges.includes(b));
+        if (newBadges.length > 0) {
+           setEarnedBadges([...earnedBadges, ...newBadges]);
+        }
+      }
+    } catch (err) {
+      console.error("Submit quiz API error:", err);
+      // Fallback
+      if (result.score === result.total) {
+        if (!earnedBadges.includes('expert')) {
+          setEarnedBadges([...earnedBadges, 'expert']);
+        }
       }
     }
   };

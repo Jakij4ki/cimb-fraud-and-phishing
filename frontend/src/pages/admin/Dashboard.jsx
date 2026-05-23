@@ -5,6 +5,7 @@ import StatsChart from '../../components/admin/StatsChart';
 import TriageTable from '../../components/admin/TriageTable';
 import ThreatMap from '../../components/admin/ThreatMap';
 import Button from '../../components/ui/Button';
+import { adminService } from '../../services/adminService';
 
 const StatCardItem = ({ title, value, change, trend, icon: Icon, colorClass, loading }) => (
   <div className="bg-white rounded-xl shadow-sm border border-border p-6 flex items-start justify-between">
@@ -38,36 +39,43 @@ const StatCardItem = ({ title, value, change, trend, icon: Icon, colorClass, loa
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [statsData, setStatsData] = useState(null);
+  const [stats, setStats] = useState(null);
   const [recentReports, setRecentReports] = useState([]);
+  const [error, setError] = useState(null);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      // Mock API call to getDashboardStats and getReports
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const statsResponse = await adminService.getDashboardStats();
+      const reportsResponse = await adminService.getReports({ limit: 5, sort_by: 'created_at', order: 'desc' });
       
-      setStatsData({
-        total: 1245,
-        totalChange: 12,
-        pending: 45,
-        pendingChange: -5,
-        dangerToday: 18,
-        dangerChange: 20, // up, bad
-        resolvedWeek: 312,
-        resolvedChange: 8,
-        // Chart data uses defaults in StatsChart if not provided
+      setStats({
+        total: statsResponse?.total_reports || 0,
+        totalChange: 0,
+        pending: statsResponse?.pending_triage || 0,
+        pendingChange: 0,
+        dangerToday: statsResponse?.today_danger_count || 0,
+        dangerChange: 0,
+        resolvedWeek: statsResponse?.resolved_this_week || 0,
+        resolvedChange: 0,
+        trend: statsResponse?.trend_weekly,
+        distribution: statsResponse?.by_risk_level ? [
+          { name: 'Aman', value: statsResponse.by_risk_level.safe || 0, color: '#10b981' },
+          { name: 'Waspada', value: statsResponse.by_risk_level.warning || 0, color: '#f59e0b' },
+          { name: 'Bahaya', value: statsResponse.by_risk_level.danger || 0, color: '#ef4444' }
+        ] : undefined
       });
 
-      setRecentReports([
-        { id: 'PG-2026-01234', message_text: 'Yth Nasabah, rek anda diblokir. Klik s.id/cimb-update', risk_score: 95, risk_level: 'danger', status: 'submitted', created_at: new Date().toISOString() },
-        { id: 'PG-2026-01233', message_text: 'Selamat! Nomor Anda terpilih memenangkan undian 100jt', risk_score: 85, risk_level: 'danger', status: 'in_review', created_at: new Date(Date.now() - 3600000).toISOString() },
-        { id: 'PG-2026-01232', message_text: 'Mohon info alamat pengiriman paket J&T yg tertunda', risk_score: 65, risk_level: 'warning', status: 'confirmed', created_at: new Date(Date.now() - 7200000).toISOString() },
-        { id: 'PG-2026-01231', message_text: 'Paket anda belum diambil, cek detail apk', risk_score: 88, risk_level: 'danger', status: 'mitigated', created_at: new Date(Date.now() - 86400000).toISOString() },
-        { id: 'PG-2026-01230', message_text: 'Promo diskon 50% di merchant partner', risk_score: 15, risk_level: 'safe', status: 'false_positive', created_at: new Date(Date.now() - 172800000).toISOString() },
-      ]);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
+      if (reportsResponse && reportsResponse.data) {
+        setRecentReports(reportsResponse.data);
+      } else {
+        setRecentReports([]);
+      }
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+      setError("Gagal memuat dashboard. Periksa koneksi backend.");
+    } finally {
       setLoading(false);
     }
   };
@@ -78,14 +86,25 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl shadow-sm text-center">
+        <ShieldAlert size={32} className="mx-auto mb-3" />
+        <h3 className="text-lg font-bold">Error</h3>
+        <p>{error}</p>
+        <Button onClick={fetchData} className="mt-4" variant="outline">Coba Lagi</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCardItem 
           title="Total Laporan" 
-          value={statsData?.total || 0} 
-          change={statsData?.totalChange || 0} 
+          value={stats?.total || 0} 
+          change={stats?.totalChange || 0} 
           trend="up" 
           icon={FileText} 
           colorClass="bg-blue-50 text-blue-500" 
@@ -93,8 +112,8 @@ const Dashboard = () => {
         />
         <StatCardItem 
           title="Menunggu Triage" 
-          value={statsData?.pending || 0} 
-          change={statsData?.pendingChange || 0} 
+          value={stats?.pending || 0} 
+          change={stats?.pendingChange || 0} 
           trend="down" 
           icon={Clock} 
           colorClass="bg-amber-50 text-amber-500" 
@@ -102,8 +121,8 @@ const Dashboard = () => {
         />
         <StatCardItem 
           title="Bahaya Hari Ini" 
-          value={statsData?.dangerToday || 0} 
-          change={statsData?.dangerChange || 0} 
+          value={stats?.dangerToday || 0} 
+          change={stats?.dangerChange || 0} 
           trend="up" 
           icon={ShieldAlert} 
           colorClass="bg-red-50 text-red-500" 
@@ -111,8 +130,8 @@ const Dashboard = () => {
         />
         <StatCardItem 
           title="Selesai (Minggu)" 
-          value={statsData?.resolvedWeek || 0} 
-          change={statsData?.resolvedChange || 0} 
+          value={stats?.resolvedWeek || 0} 
+          change={stats?.resolvedChange || 0} 
           trend="up" 
           icon={CheckCircle} 
           colorClass="bg-emerald-50 text-emerald-500" 
@@ -127,7 +146,7 @@ const Dashboard = () => {
            <div className="bg-slate-100 animate-pulse h-96 rounded-xl lg:col-span-1"></div>
         </div>
       ) : (
-        <StatsChart data={statsData} />
+        <StatsChart data={stats} />
       )}
 
       {/* Recent Reports Table */}

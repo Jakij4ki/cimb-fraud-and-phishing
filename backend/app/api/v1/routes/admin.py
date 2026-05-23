@@ -4,6 +4,7 @@ from sqlalchemy import select, func
 from app.schemas.admin import LoginRequest, TokenResponse, ReportListResponse, ReportDetailResponse, UpdateReportRequest, WhitelistCreate
 from app.models.admin import AdminUser
 from app.models.report import Report
+from app.models.whitelist import WhitelistURL, WhitelistPhone
 from app.core.security import verify_password, create_access_token
 from app.core.audit import log_action
 from app.api.deps import get_db, get_current_admin, get_client_ip, limiter
@@ -124,12 +125,59 @@ async def update_report(
     
 @router.get("/whitelist")
 async def get_whitelist(db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin)):
-    return {"message": "Whitelist data"}
+    urls_res = await db.execute(select(WhitelistURL))
+    phones_res = await db.execute(select(WhitelistPhone))
+    
+    return {
+        "urls": urls_res.scalars().all(),
+        "phones": phones_res.scalars().all()
+    }
 
 @router.post("/whitelist")
-async def add_whitelist(payload: WhitelistCreate, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin)):
-    return {"message": "Whitelist added"}
+async def add_whitelist(request: Request, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin)):
+    data = await request.json()
+    item_type = data.get("type", "").lower()
+    value = data.get("value")
+    label = data.get("label")
+    category = data.get("category")
+    is_active = data.get("is_active", True)
+    
+    if item_type == "url":
+        new_item = WhitelistURL(
+            domain=value,
+            label=label,
+            category=category,
+            is_active=is_active
+        )
+    elif item_type == "phone":
+        new_item = WhitelistPhone(
+            phone_number=value,
+            label=label,
+            institution=category,
+            is_active=is_active
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Invalid type")
+        
+    db.add(new_item)
+    await db.commit()
+    return {"message": "Whitelist added successfully"}
 
 @router.delete("/whitelist/{id}")
-async def delete_whitelist(id: str, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin)):
-    return {"message": "Whitelist deleted"}
+async def delete_whitelist(id: str, type: str, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin)):
+    if type.lower() == "url":
+        stmt = select(WhitelistURL).where(WhitelistURL.id == id)
+    elif type.lower() == "phone":
+        stmt = select(WhitelistPhone).where(WhitelistPhone.id == id)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid type")
+        
+    res = await db.execute(stmt)
+    item = res.scalar_one_or_none()
+    
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+        
+    await db.delete(item)
+    await db.commit()
+    return {"message": "Whitelist deleted successfully"}
