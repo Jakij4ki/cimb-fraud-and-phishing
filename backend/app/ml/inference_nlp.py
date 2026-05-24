@@ -117,8 +117,8 @@ class PhishingNLPModel:
     def predict(self, text: str) -> dict:
         try:
             future = self.executor.submit(self._model_predict, text)
-            # Timeout 5 seconds to prevent blocking
-            return future.result(timeout=5.0)
+            # Timeout 30 seconds to handle PyTorch CPU cold-start on first inference
+            return future.result(timeout=30.0)
         except TimeoutError:
             logger.warning("NLP model prediction timed out. Falling back to rule-based.")
             return self._rule_based_predict(text)
