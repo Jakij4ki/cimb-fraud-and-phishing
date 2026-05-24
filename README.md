@@ -304,9 +304,12 @@ Aplikasi berjalan di: `http://localhost`
  
 ---
  
-## Training Model ML
- 
-Model ML bersifat opsional — sistem tetap bisa berjalan menggunakan **fallback rule-based** tanpa model. Fallback menggunakan daftar kata kunci manipulatif Bahasa Indonesia yang sudah dikurasi.
+## Arsitektur ML & Validasi Mode Inference
+
+SafeCheck menyediakan dua mode inference. Mode Demo Default menggunakan rule-based fallback agar aplikasi ringan dan stabil saat dijalankan melalui Docker Compose. Mode ML Full menggunakan IndoBERT dengan dependency `torch` dan `transformers` yang dipisahkan melalui `Dockerfile.ml` dan `docker-compose.ml.yml`.
+
+Pada validasi Mode ML Full, model IndoBERT berhasil dimuat dengan log `"NLP model loaded successfully"` dan `"NLP mode: IndoBERT active"`. Endpoint `POST /api/v1/analyze` juga telah tervalidasi mengembalikan `"nlp_method": "indobert"` dengan confidence **0.9979** pada contoh pesan phishing. Timeout inference dinaikkan dari 5 detik menjadi 30 detik untuk mengakomodasi cold-start PyTorch CPU pada request pertama.
+
  
 Untuk training penuh, jalankan berurutan:
  

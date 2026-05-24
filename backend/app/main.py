@@ -101,6 +101,6 @@ async def startup_event():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "version": "1.0.0"}
+    return {"status": "ok", "service": "backend", "version": "1.0.0"}
 
 app.include_router(api_router, prefix="/api/v1")
