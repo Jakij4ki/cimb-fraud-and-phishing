@@ -306,11 +306,12 @@ Aplikasi berjalan di: `http://localhost`
  
 ## Arsitektur ML & Validasi Mode Inference
 
-SafeCheck menyediakan dua mode inference. Mode Demo Default menggunakan rule-based fallback agar aplikasi ringan dan stabil saat dijalankan melalui Docker Compose. Mode ML Full menggunakan IndoBERT dengan dependency `torch` dan `transformers` yang dipisahkan melalui `Dockerfile.ml` dan `docker-compose.ml.yml`.
+SafeCheck menyediakan dua mode inference. Mode Demo Default menggunakan rule-based fallback agar aplikasi ringan, stabil, dan cepat dijalankan melalui Docker Compose. Mode ML Full menggunakan IndoBERT dengan dependency `torch` dan `transformers` yang dipisahkan melalui `Dockerfile.ml` dan `docker-compose.ml.yml`.
 
-Pada validasi Mode ML Full, model IndoBERT berhasil dimuat dengan log `"NLP model loaded successfully"` dan `"NLP mode: IndoBERT active"`. Endpoint `POST /api/v1/analyze` juga telah tervalidasi mengembalikan `"nlp_method": "indobert"` dengan confidence **0.9979** pada contoh pesan phishing. Timeout inference dinaikkan dari 5 detik menjadi 30 detik untuk mengakomodasi cold-start PyTorch CPU pada request pertama.
+Pada validasi Mode ML Full, model IndoBERT berhasil dimuat dengan log `"NLP model loaded successfully"` dan `"NLP mode: IndoBERT active"`. Endpoint `POST /api/v1/analyze` juga telah tervalidasi mengembalikan `"nlp_method": "indobert"` dengan confidence tinggi pada contoh pesan phishing.
 
- 
+Untuk meningkatkan stabilitas deployment, backend dilengkapi endpoint `/health` dan Docker healthcheck. Service Nginx dikonfigurasi agar hanya berjalan setelah backend berstatus healthy, sehingga tidak lagi terjadi race condition saat startup container.
+
 Untuk training penuh, jalankan berurutan:
  
 ```bash
